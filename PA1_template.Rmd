@@ -1,25 +1,203 @@
 ---
 title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
+keep_md: true
 ---
 
 
 ## Loading and preprocessing the data
+##Part 1 of assignment
+
+Read input file into a dataframe ignoring NAs and handling factors
+
+```{r read data,echo=TRUE}
+library(dplyr)
+data <- read.csv("activity.csv", stringsAsFactors=T)
+complete<-na.omit(data)
+```
 
 
 
 ## What is mean total number of steps taken per day?
 
+Perpare the sum, mean, and median
+
+```{r group data, echo=TRUE}
+daily<-group_by(complete,date) 
+(per_day   <- summarise(daily, Sum= sum(steps),Mean=mean(steps), Median=median(steps)))
+```
 
 
 ## What is the average daily activity pattern?
 
+Draw the histogram for the sum
 
+```{r histogram plot, echo=TRUE}
+hist(per_day$Sum)
+```
+
+##Part 2 of assignment
+
+Prepare the data to get the average for the 5 min interval
+```{r}
+interval<-group_by(complete,interval) 
+(grouped_interval   <- summarise(interval, Average= mean(steps)))
+```
+
+Plot the average
+
+```{r, echo=TRUE}
+plot(grouped_interval$Average~grouped_interval$interval,type="l",ylab="Average Steps", xlab=" 5-minute interval",main="Average Interval Steps")
+```
+
+Finding the interval with maximum average
+
+```{r,echo=TRUE}
+Max_Int<-max(grouped_interval$Average)
+grouped_interval[ which(grouped_interval$Average==Max_Int),1]
+```
 
 ## Imputing missing values
+##Part 3 of assignment
+
+Compute the number of NA rows
+```{r, echo=TRUE}
+sub<-subset(data,is.na(data$steps)==TRUE)
+dim(sub)[1]
+```
+
+Filling the missing data using the mean for the interval
+Make a copy of original data so as not to loose it !!
+```{r,echo=TRUE}
+data1<-data
+
+interval2<-group_by(data1,interval) 
+(grouped_interval2   <- summarise(interval2, 
+                                  Average= mean(steps,na.rm=TRUE)))
+index<-which(is.na(data1)==TRUE)
+for(i in 1:length(index))
+        {
+        inter1<-data1[index[i],3]
+        new_steps<-grouped_interval2[which(grouped_interval2[1]
+                                           == inter1),2]                                  
+        data1[index[i],1]=ceiling(new_steps)
+        }
+## display the first 20 rows of the new dataset without NAs
+
+head(data1,20)
+```
+
+Calcualte the new sum, mean, and median of the new dataset and draw the histogram
+
+Perpare the sum, mean, and median
+
+```{r}
+daily2<-group_by(data1,date) 
+(per_day2   <- summarise(daily2, Sum= sum(steps),Mean=mean(steps), Median=median(steps)))
+```
+
+Draw the histogram for the sum
+
+```{r, echo=TRUE}
+hist(per_day2$Sum,xlab=" Total number of steps taken each day", main="Total No. of Steps")
+```
+
+compare results before and after adding missing data
+```{r before and after, echo=TRUE}
+#par(mfrow=c(2,1))
+
+v1<-as.numeric(per_day$Mean)
+v2<-as.numeric(per_day$Median)
+v3<-as.numeric(per_day2$Mean)
+v4<-as.numeric(per_day2$Median)
+
+plot_colors <- c("black","red")
+
+plot(v1, type="l", col=plot_colors[1], xaxt = "n",ylab="",xlab="")
+lines(v3, type="l", col=plot_colors[2])
+
+title(ylab= "Average Steps")
+title(xlab="Day")
+axis(1,at=1:53,labels=per_day$date)
+
+legend("topleft",legend=(c("Mean Without NAs","Mean with NAs")), 
+       col=plot_colors,pch = c(1,2), lty = c(1,2)) 
+# gives the legend lines the correct color and width
+
+
+plot(v2, type="l", col=plot_colors[1], xaxt = "n",ylab="",xlab="")
+lines(v4, type="l", col=plot_colors[2])
+
+title(ylab= "Median step value")
+title(xlab="Day ")
+axis(1,at=1:53,labels=per_day$date)
+
+legend("bottomleft",legend=(c("Median Without NAs","Median with NAs")),col=plot_colors,pch = c(1,2), lty = c(1,2)) 
+# gives the legend lines the correct color and width
+```
+Effect of adding missing values on total number of daily steps
+```{r effect on sum,echo=TRUE}
+v5<-as.numeric(per_day$Sum)
+v6<-as.numeric(per_day2$Sum)
+
+plot_colors <- c("black","red")
+
+plot(v5, type="l", col=plot_colors[1], xaxt = "n",ylab="",xlab="")
+lines(v6, type="l", col=plot_colors[2])
+
+title(ylab= "Total Steps")
+title(xlab="Day")
+axis(1,at=1:53,labels=per_day$date)
+
+legend("topleft",legend=(c("Sum Without NAs","Sum with NAs")), col=plot_colors,pch = c(1,2), lty = c(1,2)) # gives the legend lines the correct color and width
+```
 
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
+```{r weekday, echo=TRUE}
+library(timeDate)
+library(dplyr)
+
+wend<-NULL
+for(i in 1:dim(data1)[1])
+        {
+        wend[i]<-isWeekend(data1[i,2])
+        }
+data2<-cbind(data1,wend)
+
+inter3<-subset(data2,data2$wend=="FALSE")
+group1<-group_by(inter3,interval) 
+(weekday_avg  <- summarise(group1,Mean=mean(steps)))
+inter4<-subset(data2,data2$wend=="TRUE")
+group2<-group_by(inter4,interval) 
+(weekend_avg  <- summarise(group2,Mean=mean(steps)))
+
+
+# plot_colors <- c("black","red")
+# 
+# plot(weekday_avg$Mean, type="l", col=plot_colors[1], xaxt = "n",ylab="",xlab="")
+# lines(weekend_avg$Mean, type="l", col=plot_colors[2])
+# 
+# title(ylab= "Average Steps")
+# title(xlab="Interval")
+# axis(1,at=1:288,labels=weekday_avg$interval)
+# 
+# legend("topleft",legend=(c("Weekday Average","Weekend Average")), col=plot_colors,pch = c(1,2), lty = c(1,2))
+
+library(ggplot2)
+require(gridExtra)
+
+
+p1<-ggplot(data=weekend_avg, aes(x=weekend_avg$interval, y=weekend_avg$Mean, group=1)) + 
+  geom_line(size=1) + 
+  xlab("5-minute interval") +
+  ylab("Average Steps") +
+  ggtitle("Weekday Mean Steps")
+
+p2<-ggplot(data=weekday_avg, aes(x=weekday_avg$interval, y=weekday_avg$Mean, group=1)) + 
+  geom_line(size=1) + 
+    xlab("5-minute interval") +
+  ylab("Average Steps") +
+  ggtitle("Weekend Mean Steps")
+grid.arrange(p1, p2, nrow=2)
+```
