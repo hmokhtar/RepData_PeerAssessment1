@@ -1,16 +1,27 @@
 ---
-title: "Reproducible Research: Peer Assessment 1"
-keep_md: true
+title: 'Reproducible Research: Peer Assessment 1'
+output:
+  html_document:
+    keep_md: yes
+keep_md: yes
 ---
 
 
 ## Loading and preprocessing the data
 ##Part 1 of assignment
 
+```{r preparing R,echo=TRUE}
+library(dplyr)
+library(ggplot2)
+library(knitr)
+
+```                      
+
+
 Read input file into a dataframe ignoring NAs and handling factors
 
 ```{r read data,echo=TRUE}
-library(dplyr)
+
 data <- read.csv("activity.csv", stringsAsFactors=T)
 complete<-na.omit(data)
 ```

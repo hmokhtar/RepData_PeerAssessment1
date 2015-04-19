@@ -205,10 +205,17 @@ hr {
 
 <p>##Part 1 of assignment</p>
 
+<pre><code class="r">library(dplyr)
+library(ggplot2)
+library(knitr)
+
+opts_knit$set(root.dir=normalizePath(&#39;./&#39;))
+opts_chunk$set(fig.path = &quot;./figures/&quot;) 
+</code></pre>
+
 <p>Read input file into a dataframe ignoring NAs and handling factors</p>
 
-<pre><code class="r">library(dplyr)
-data &lt;- read.csv(&quot;activity.csv&quot;, stringsAsFactors=T)
+<pre><code class="r">data &lt;- read.csv(&quot;activity.csv&quot;, stringsAsFactors=T)
 complete&lt;-na.omit(data)
 </code></pre>
 

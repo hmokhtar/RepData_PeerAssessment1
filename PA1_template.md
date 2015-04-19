@@ -7,11 +7,21 @@ keep_md: true
 ## Loading and preprocessing the data
 ##Part 1 of assignment
 
+
+```r
+library(dplyr)
+library(ggplot2)
+library(knitr)
+
+opts_knit$set(root.dir=normalizePath('./'))
+opts_chunk$set(fig.path = "./figures/") 
+```
+
+
 Read input file into a dataframe ignoring NAs and handling factors
 
 
 ```r
-library(dplyr)
 data <- read.csv("activity.csv", stringsAsFactors=T)
 complete<-na.omit(data)
 ```
@@ -97,7 +107,7 @@ Draw the histogram for the sum
 hist(per_day$Sum)
 ```
 
-![plot of chunk histogram plot](figure/histogram plot-1.png) 
+![plot of chunk histogram plot](./figures/histogram plot-1.png) 
 
 ##Part 2 of assignment
 
@@ -132,7 +142,7 @@ Plot the average
 plot(grouped_interval$Average~grouped_interval$interval,type="l",ylab="Average Steps", xlab=" 5-minute interval",main="Average Interval Steps")
 ```
 
-![plot of chunk unnamed-chunk-2](figure/unnamed-chunk-2-1.png) 
+![plot of chunk unnamed-chunk-2](./figures/unnamed-chunk-2-1.png) 
 
 Finding the interval with maximum average
 
@@ -310,7 +320,7 @@ Draw the histogram for the sum
 hist(per_day2$Sum,xlab=" Total number of steps taken each day", main="Total No. of Steps")
 ```
 
-![plot of chunk unnamed-chunk-7](figure/unnamed-chunk-7-1.png) 
+![plot of chunk unnamed-chunk-7](./figures/unnamed-chunk-7-1.png) 
 
 compare results before and after adding missing data
 
@@ -335,7 +345,7 @@ legend("topleft",legend=(c("Mean Without NAs","Mean with NAs")),
        col=plot_colors,pch = c(1,2), lty = c(1,2)) 
 ```
 
-![plot of chunk before and after](figure/before and after-1.png) 
+![plot of chunk before and after](./figures/before and after-1.png) 
 
 ```r
 # gives the legend lines the correct color and width
@@ -351,7 +361,7 @@ axis(1,at=1:53,labels=per_day$date)
 legend("bottomleft",legend=(c("Median Without NAs","Median with NAs")),col=plot_colors,pch = c(1,2), lty = c(1,2)) 
 ```
 
-![plot of chunk before and after](figure/before and after-2.png) 
+![plot of chunk before and after](./figures/before and after-2.png) 
 
 ```r
 # gives the legend lines the correct color and width
@@ -374,7 +384,7 @@ axis(1,at=1:53,labels=per_day$date)
 legend("topleft",legend=(c("Sum Without NAs","Sum with NAs")), col=plot_colors,pch = c(1,2), lty = c(1,2)) # gives the legend lines the correct color and width
 ```
 
-![plot of chunk effect on sum](figure/effect on sum-1.png) 
+![plot of chunk effect on sum](./figures/effect on sum-1.png) 
 
 
 
@@ -466,4 +476,4 @@ p2<-ggplot(data=weekday_avg, aes(x=weekday_avg$interval, y=weekday_avg$Mean, gro
 grid.arrange(p1, p2, nrow=2)
 ```
 
-![plot of chunk weekday](figure/weekday-1.png) 
+![plot of chunk weekday](./figures/weekday-1.png) 
